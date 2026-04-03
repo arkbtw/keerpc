@@ -7,7 +7,7 @@ readme="README.md"
 license = "GPL-3.0-only"
 license-files = ["LICEN[CS]E*"]
 requires-python=">=3.11"
-dependencies=["json-rpc","aiohttp","pycryptodome","dacite","pykeepass","pyotp"]
+dependencies=["json-rpc","aiohttp","pycryptodome","dacite","pykeepass","pyotp","platformdirs"]
 classifiers=[
  "Topic :: Security", 
  "Topic :: Internet",
