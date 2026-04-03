@@ -1,6 +1,5 @@
 from __future__ import annotations
 from dataclasses import dataclass,asdict
-from pathlib import Path
 import subprocess
 from typing import Callable
 from urllib.parse import urlparse
@@ -152,7 +151,6 @@ class Database:
         for e in g.subgroups:
             groups.append(JGroup.fromdb_group(e))
         root=JGroup(g.name,g.uuid.hex,g.icon,g.path,entries,groups)
-        filename=db.filename if Path.is_file(db.filename) else str(dblist.index(db))
         return Database(db.database_name,db.filename,g.icon,root,True)
 
 
