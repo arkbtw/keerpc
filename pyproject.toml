@@ -1,0 +1,17 @@
+[project]
+name="keerpc"
+version="0.1.1"
+authors=[{name="abdurahman",email="abdurahmankizhakkail@gmail.com"}]
+description="A KeepassRPC server implementation in Python."
+readme="README.md"
+license = "GPL-3.0-only"
+license-files = ["LICEN[CS]E*"]
+requires-python=">=3.11"
+dependencies=["json-rpc","aiohttp","pycryptodome","dacite","pykeepass","pyotp"]
+classifiers=[
+ "Topic :: Security", 
+ "Topic :: Internet",
+]
+
+[project.scripts]
+keerpc="keerpc.cli:main"
