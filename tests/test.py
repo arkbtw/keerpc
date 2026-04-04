@@ -1,7 +1,5 @@
 from base64 import b64decode, b64encode
 from hashlib import sha1, sha256
-import hashlib
-from io import BytesIO
 import json
 import pickle
 import secrets
@@ -85,17 +83,15 @@ class RPCtests(unittest.TestCase):
         self.maxDiff=None
         self.assertEqual(json.loads(result),DATA.FindLogins.res)
     def test_remote_save(self):
-        filename="tests/testdb_copy.kdbx"
-        shutil.copy("tests/testdb.kdbx",filename)
-        original_hash=hash_file(filename)
-        db=PyKeePass(filename,"demopass")
+        shutil.copy("tests/testdb.kdbx","tests/testdb_copy.kdbx")
+        db=PyKeePass("tests/testdb_copy.kdbx","demopass")
+        entry=db.add_entry(db.root_group,"test title","user","pass","url")
+        uid=entry.uuid
         save_remote(db)
-        saved_hash=hash_file(filename)
-        self.assertEqual(original_hash,saved_hash)
+        db=PyKeePass("tests/testdb_copy.kdbx","demopass")
+        entry=db.find_entries(title="test title",first=True)
+        self.assertEqual(entry.uuid,uid)
         
-def hash_file(filename:str):
-    with open(filename,"rb") as f:
-        return hashlib.file_digest(f,"sha256").digest()
 
 
 def client_authenticate(password:str,salt:bytes,server_ekey:int,client_secret:int,client_ekey:int):
