@@ -15,18 +15,15 @@ import string
 import secrets
 import pyotp
 import re
+import io
 
 dblist:list[PyKeePass]=[]
 
-def save_remote(db:PyKeePass,transformed_key=None):
-    db_bytes=KDBX.build(
-        db.kdbx,
-        password=db.password,
-        keyfile=db.keyfile,
-        transformed_key=transformed_key,
-        decrypt=True
-    )
-    subprocess.run(["gio","save",db.filename],input=db_bytes,check=True)
+def save_remote(db:PyKeePass):
+    db_buff=io.BytesIO()
+    db.save(db_buff)
+    b=db_buff.getbuffer().tobytes()
+    subprocess.run(["gio","save",db.filename],input=b,check=True)
 
 def is_remote(filename:str):
     r=subprocess.run(["gio","info","-f",filename],capture_output=True)
