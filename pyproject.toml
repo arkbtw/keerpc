@@ -1,6 +1,6 @@
 [project]
 name="keerpc"
-version="0.1.1"
+version="0.1.2"
 authors=[{name="abdurahman",email="abdurahmankizhakkail@gmail.com"}]
 description="A KeepassRPC server implementation in Python."
 readme="README.md"
