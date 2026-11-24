@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass,asdict
 import subprocess
 from typing import Callable
-from urllib.parse import urlparse
+from urllib.parse import parse_qs,urlsplit
 from enum import Enum
 import json
 from uuid import UUID
@@ -83,7 +83,7 @@ def FindLogins(url:list[str],action_url:str,realm:str,search_type:LoginSearchTyp
     if len(url)>0:
         entries=[]
         for u in url:
-            parsed=urlparse(u,scheme="http")
+            parsed=urlsplit(u,scheme="http")
             host=f"{parsed.scheme}://{parsed.netloc}.*"
             find=lambda db:db.find_entries(username=username,url=parsed.geturl() if full_match else host,recursive=True,regex=True)
             entries.extend([asdict(JEntry.fromdb_entry(e,db)) for db,e in mapall_dbs(find)])
@@ -205,6 +205,9 @@ class LoginSearchType(int,Enum):
     LSTnoForms=1
     LSTnoRealms=2
 
+class TOTP80(pyotp.TOTP):
+    min_secret_length_bits = 80
+
 @dataclass
 class JEntry:
     db:Database|None
@@ -230,8 +233,9 @@ class JEntry:
         password=Field('password','password',entry.password,'password',"FFTpassword",0)
         fields=[username,password]
         if entry.otp:
-            parsed=pyotp.parse_uri(entry.otp)
-            otp=pyotp.TOTP(parsed.secret).now()
+            parsed=urlsplit(entry.otp).query
+            secret=parse_qs(parsed)["secret"][0]
+            otp=TOTP80(secret).now()
             fields.append(Field('otp','otp',otp,'otp',"FFTtext",0))
         e=JEntry(db,g,entry.icon,False,False,False,False,0,[entry.url],0,'',entry.uuid.hex,entry.title,fields)
         return e
@@ -243,6 +247,6 @@ class JEntry:
         if self.formFieldList:
             username=next((f.value for f in self.formFieldList if f.type=="FFTusername"),None)
             password=next((f.value for f in self.formFieldList if f.type=="FFTpassword"),None)
-        parsed=urlparse(self.uRLs[0],scheme="http") if self.uRLs else None
+        parsed=urlsplit(self.uRLs[0],scheme="http") if self.uRLs else None
         url=f"{parsed.scheme}://{parsed.netloc}" if parsed else None
         return (title,username,password,url)
